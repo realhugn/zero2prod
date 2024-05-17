@@ -34,7 +34,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     let mut conn = PgConnection::connect(&config.connection_string_without_db())
         .await
         .expect("Error connecting to databasse");
-    let _ = conn.execute(format!("Create database {}", config.database_name).as_str());
+    let _ = conn.execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str()).await.expect("Failed to create database.");
 
     // migrate
     let pool = PgPool::connect(&config.connection_string())
@@ -43,7 +43,8 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
 
     let _ = sqlx::migrate!("./migrations")
         .run(&pool)
-        .await;
+        .await
+        .expect("Failed to migrate the database");
     pool
 }
 
@@ -85,7 +86,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .await
         .expect("Failed to fetch inserted.");
 
-    assert_eq!(inserted.email, "realhugn@email.com");
+    assert_eq!(inserted.email, "realhugn@gmail.com");
     assert_eq!(inserted.name, "real hung")
 }
 

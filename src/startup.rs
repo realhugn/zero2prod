@@ -8,7 +8,7 @@ use std::net::TcpListener;
 
 pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
 
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    // env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     /*
         HttpServer::new does not take App as argument - it wants a closure that returns an App struct.

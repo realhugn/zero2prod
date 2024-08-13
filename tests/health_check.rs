@@ -21,7 +21,7 @@ async fn spawn_app() -> TestApp {
 
     let connection_pool = configure_database(&configuration.database).await;
     let server = startup::run(listener, connection_pool.clone())
-    .expect("Failed to bind address");
+    .   expect("Failed to bind address");
     let _ = tokio::spawn(server);
     TestApp {
         address,
@@ -87,7 +87,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .expect("Failed to fetch inserted.");
 
     assert_eq!(inserted.email, "realhugn@gmail.com");
-    assert_eq!(inserted.name, "real hung")
+    assert_eq!(inserted.name, "real hung");
 }
 
 #[tokio::test]

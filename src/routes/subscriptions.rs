@@ -13,8 +13,7 @@ pub struct FormData {
 pub async fn subscribe(
     _form: web::Form<FormData>,
     _pool: web::Data<PgPool>
-) -> HttpResponse {
-    let request_id = Uuid::new_v4();
+) -> HttpResponse {    let request_id = Uuid::new_v4();
 
     let request_span = tracing::info_span!(
         "Adding a new subscriber.",
@@ -42,7 +41,7 @@ pub async fn subscribe(
             HttpResponse::Ok().body("Thanks you for your subscription")
         },
         Err(e) => {
-            tracing::error!("Frequest_id {} - ailed to execute query: {:?}",request_id, e);
+            tracing::error!("Frequest_id {} - Failed to execute query: {:?}",request_id, e);
             return HttpResponse::InternalServerError().finish()
         }
     }

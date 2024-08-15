@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
 use sqlx::types::Uuid;
+use tracing::Instrument;
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -13,7 +14,9 @@ pub struct FormData {
 pub async fn subscribe(
     _form: web::Form<FormData>,
     _pool: web::Data<PgPool>
-) -> HttpResponse {    let request_id = Uuid::new_v4();
+) -> HttpResponse {    
+    
+    let request_id = Uuid::new_v4();
 
     let request_span = tracing::info_span!(
         "Adding a new subscriber.",
@@ -22,8 +25,11 @@ pub async fn subscribe(
         subscriber_name= %_form.name
     );
     let _request_span_guard = request_span.enter();
-    tracing::info!("request_id {} - Saving new subscriber details in the database", request_id);
 
+    let query_span = tracing::info_span!(
+        "Saving new subscriber details in the database"
+    );
+    
     match sqlx::query!(r#"
         insert into subscriptions (id, email, name, subscribed_at) 
             values ($1, $2, $3, $4);
@@ -34,6 +40,7 @@ pub async fn subscribe(
         Utc::now()
         )
         .execute(_pool.as_ref())
+        .instrument(query_span)
         .await
         {
         Ok(_) => {
